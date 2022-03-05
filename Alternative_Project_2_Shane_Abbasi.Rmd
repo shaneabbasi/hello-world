@@ -1,0 +1,110 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+
+```{r}
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(eval = FALSE)
+```
+```
+
+
+```{r}
+plot(cars)
+{r setup, include = FALSE}
+knitr::opts_chunk$set(eval = FALSE)
+```
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+
+```{r}
+#BiocManager::install("muscle")
+library(BiocManager)
+library(Biostrings)
+library(BiocGenerics)
+library(S4Vectors)
+library(seqinr)
+library(msa)
+
+```
+
+```{r}
+VEGFR2_unaligned <- readAAStringSet("VEGFR2_seq.fasta")
+VEGFR2_read <- read.fasta(file = "VEGFR2_seq.fasta")
+length(VEGFR2_read)
+x <- 1:length(VEGFR2_read)
+```
+
+```{r}
+library(bio3d)
+library(gplots)
+pdb <- read.pdb('2XIR')
+bs <- binding.site(pdb)
+bs_resnumbers <- bs$resno
+
+bs$resnames
+```
+
+```{r}
+Matrix2Heatmap <- function(S4sequences, seq_length) 
+  forheatmap <- matrix(nrow=length(x), ncol=length(x))
+    for (i in seq_length) 
+    for (j in seq_length)
+      
+string1 <- S4sequences[i]
+      string2 <- S4sequences[j]
+    
+ dsl = AAStringSetList(string1)
+      as.character(unlist(dsl))
+      cl = as(dsl, "CharacterList")
+      as.list(cl)
+      
+dsl2 = AAStringSetList(string2)
+      as.character(unlist(dsl2))
+      cl2 = as(dsl2, "CharacterList")
+      as.list(cl2)
+    
+      
+pa <- pairwiseAlignment(pattern = c(cl2), subject = cl)
+
+ forheatmap[i,j] <- score(pa)
+    
+  
+  return(forheatmap)
+
+
+seq_matrix_align <- Matrix2Heatmap(VEGFR2_unaligned, x)
+
+heatmap.2(seq_matrix_align)
+
+```
+
+```{r}
+system.file("tex", "texshade.sty", package="msa")
+
+Kinase_MSA <- msa(VEGFR2_unaligned)
+
+print(Kinase_MSA, show="complete")
+
+
+```
+
+```{r}
+length(bs_resnumbers)
+
+msaPrettyPrint(Kinase_MSA, output="tex", y=c((bs_resnumbers[1]+200), (bs_resnumbers[length(bs_resnumbers)]+200)),
+subset=c(1:6), showNames="left", showLogo="top",
+logoColors="rasmol", shadingMode="functional", shadingModeArg="structure",
+showLegend=FALSE, askForOverwrite=FALSE)
+```
+
